@@ -1,3 +1,21 @@
+$(document).ready( function() {
+	$('.unanswered-getter').submit( function(event){
+		event.preventDefault();
+		// zero out results if previous search has run
+		$('.results').html('');
+		// get the value of the tags the user submitted
+		var tags = $(this).find("input[name='tags']").val();
+		getUnanswered(tags);
+	});
+
+    $('.inspiration-getter').submit( function(event){
+    	event.preventDefault();
+        $('.results').html('');
+        var tag = $(this).find("input[name='answerers']").val();
+        getInspiration(tag);
+    });
+});
+
 // this function takes the question object returned by the StackOverflow request
 // and returns new result to be appended to DOM
 var showQuestion = function(question) {
@@ -65,6 +83,7 @@ var getUnanswered = function(tags) {
 		type: "GET",
 	})
 	.done(function(result){ //this waits for the ajax to return with a succesful promise object
+		console.log(result);
 		var searchResults = showSearchResults(request.tagged, result.items.length);
 
 		$('.search-results').html(searchResults);
@@ -81,14 +100,28 @@ var getUnanswered = function(tags) {
 	});
 };
 
+var getInspiration = function(tag) {
+    var url = "http://api.stackexchange.com/2.2/tags/" + tag + "/top-answerers/all_time";
+    var request = {
+        site: 'stackoverflow'
+    };
 
-$(document).ready( function() {
-	$('.unanswered-getter').submit( function(e){
-		e.preventDefault();
-		// zero out results if previous search has run
-		$('.results').html('');
-		// get the value of the tags the user submitted
-		var tags = $(this).find("input[name='tags']").val();
-		getUnanswered(tags);
-	});
-});
+    var result = $.ajax({
+        url: url,
+        data: request,
+        dataType: "jsonp",
+        type: "GET"
+    }).done(function(result) {
+        var searchResults = showSearchResults(tag, result.items.length);
+        $('.search-results').html(searchResults);
+
+        $.each(result.items, function(index, item) {
+            var inspiration = showInspiration(item);
+            $('.results').append(inspiration);
+        });
+    }).fail(function() {
+        alert('error');
+    });
+};
+
+
