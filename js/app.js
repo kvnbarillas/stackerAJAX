@@ -124,4 +124,16 @@ var getInspiration = function(tag) {
     });
 };
 
+var showInspiration = function(item) {
+	var result = $('.templates .inspiration').clone();
+	var user = result.find('.user a')
+		.attr('href', item.user.link)
+		.text(item.user.display_name);
+    var image = "<img src='" + item.user.profile_image + "' alt='" + item.user.display_name + "'>";
+    $(user).append(image);
+	result.find('.post-count').text(item.post_count);
+	result.find('.score').text(item.score);
+	
 
+	return result;
+};
